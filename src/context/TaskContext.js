@@ -14,6 +14,19 @@ export const TaskProvider = ({ children }) => {
   };
 
   const [tasks, setTasks] = useState(loadTasksFromLocalStorage);
+  const [input, setInput] = useState("");
+  const [filter, setFilter] = useState("all");
+  const [inputSearch, setInputSearch] = useState("");
+
+  const filteredTasks = tasks
+    .filter((task) => {
+      if (filter === "active") return !task.completed;
+      if (filter === "completed") return task.completed;
+      return true;
+    })
+    .filter((task) =>
+      task.name.toLowerCase().includes(inputSearch.toLowerCase())
+    );
 
   const addTask = (name) => {
     const newTask = { id: Date.now().toString(), name, completed: false };
@@ -37,7 +50,27 @@ export const TaskProvider = ({ children }) => {
     localStorage.setItem(id, JSON.stringify(updatedTask));
   };
 
-  const value = { tasks, addTask, deleteTask, toggleTaskCompleted };
+  const handleAddTask = () => {
+    if (input.trim()) {
+      addTask(input);
+      setInput("");
+    }
+  };
+
+  const value = {
+    tasks,
+    input,
+    filter,
+    inputSearch,
+    filteredTasks,
+    setInput,
+    setFilter,
+    setInputSearch,
+    addTask,
+    toggleTaskCompleted,
+    deleteTask,
+    handleAddTask,
+  };
 
   return <TaskContext.Provider value={value}>{children}</TaskContext.Provider>;
 };
